@@ -133,3 +133,6 @@ dmypy.json
 
 # MacOS stuff
 *.DS_Store
+
+# project specific stuff
+data/raw_peaks
