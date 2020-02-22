@@ -6,26 +6,27 @@ from collections import defaultdict
 # np.savetxt('./lda/tests/toy.txt', data, fmt="%d")
 
 # input file
-data = open('./lda/tests/tweets.txt').readlines()
+data = open('tweets.txt').readlines()
 
 tokens = set()
 for line in data:
     line = line.strip().split(' ')
     tokens.update(line) # update tokens
 
-with open('./lda/tests/tweets.tokens', 'w') as f:
-    for t in tokens:
+token_dict = dict()
+with open('tweets.tokens', 'w') as f:
+    for i, t in enumerate(tokens):
+        token_dict[t]=len(token_dict)
         f.write(t+"\n")
 
-
 print("Running on ", len(data), " tweets")
-with open('./lda/tests/tweets.ldac', 'w') as f:
+with open('tweets.ldac', 'w') as f:
     for i, line in enumerate(data):
         doc_term = defaultdict(lambda: 0)
         line = line.strip().split(' ')
 
         for term in line:
-            term = tokens.index(term)
+            term = token_dict[term]
             doc_term[term]+=1
 
         terms = len(doc_term)
@@ -38,7 +39,3 @@ with open('./lda/tests/tweets.ldac', 'w') as f:
 
         if i%1000==0:
             print("Ran on 1000 tweets.")
-
-with open('./lda/tests/tweets.tokens', 'w') as f:
-    for t in tokens:
-        f.write(t+"\n")
