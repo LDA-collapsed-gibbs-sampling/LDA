@@ -1,21 +1,20 @@
 from __future__ import absolute_import, unicode_literals  # noqa
-
 import os
-
 import lda.utils
 
 
 _test_dir = os.path.join(os.path.dirname(__file__), 'tests')
 
 
-def load_reuters():
-        reuters_ldac_fn = os.path.join(_test_dir, 'tweets.ldac')
-        return lda.utils.ldac2dtm(open(reuters_ldac_fn), offset=0)
+def load_datasets(dataset_name):
+        ldac_fn = os.path.join(_test_dir, dataset_name)
+        return lda.utils.ldac2dtm(open(ldac_fn), offset=0)
 
 
-def load_reuters_vocab():
-        reuters_vocab_fn = os.path.join(_test_dir, 'tweets.tokens')
-        with open(reuters_vocab_fn) as f:
+def load_dataset_vocab(dataset_name):
+        vocab_fn = os.path.join(_test_dir, dataset_name)
+        print(vocab_fn)
+        with open(vocab_fn) as f:
             vocab = tuple(f.read().split())
         return vocab
 

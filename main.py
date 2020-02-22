@@ -2,13 +2,13 @@ import numpy as np
 import lda
 import lda.datasets
 
-X = lda.datasets.load_reuters()
+n_topics = 50
+
+# test using the health tweets dataset.
+X = lda.datasets.load_datasets('tweets.ldac')
 print("Tweets loaded.")
-vocab = lda.datasets.load_reuters_vocab()
+vocab = lda.datasets.load_dataset_vocab('tweets.tokens')
 print("Vocab loaded.")
-
-n_topics = 10
-
 
 model = lda.LDA(n_topics=n_topics, n_iter=2000, random_state=10)
 
@@ -27,6 +27,21 @@ from collections import defaultdict
 probs = defaultdict(lambda: 0)
 normalize_probs = 0
 
+
+n_top_words = 2
+for i, topic_dist in enumerate(topic_word):
+    topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
+    print('Topic {}: {}'.format(i, ' '.join(topic_words)))
+
+
+# uncomment to check the entire dataset.
+# print("Document-topic matrix")
+# doc_topic = model.doc_topic_
+# print(doc_topic)
+
+
+# uncomment to verify the probability on the toy dataset
+
 # mapping = []
 # for line in data:
 # 	mapping.append(line.strip())
@@ -40,17 +55,6 @@ normalize_probs = 0
 # 	probs[i]/=normalize_probs
 
 # print(probs)
-
-# n_top_words = 2
-# for i, topic_dist in enumerate(topic_word):
-#     topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
-#     print('Topic {}: {}'.format(i, ' '.join(topic_words)))
-
-print("Document-topic matrix")
-# print(model.doc_topic_)
-doc_topic = model.doc_topic_
-print(doc_topic)
-
 
 # counts = defaultdict(lambda: 0)
 # normalize = 0
@@ -66,7 +70,3 @@ print(doc_topic)
 # 	counts[d]/=normalize
 
 # print(counts)
-
-
-for i in range(doc_topic.shape[0]):
-    print("{} (top topic: {})".format(i, doc_topic[i].argmax()))
