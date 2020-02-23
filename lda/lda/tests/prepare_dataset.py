@@ -2,7 +2,7 @@ import numpy as np
 from collections import defaultdict
 
 # generate multinomial distribution
-data = np.random.multinomial(10, [1/10]*10, size=10000)
+data = np.random.multinomial(6, [1/6]*6, size=100)
 np.savetxt('./lda/tests/data.txt', data, fmt="%d")
 
 # input file
