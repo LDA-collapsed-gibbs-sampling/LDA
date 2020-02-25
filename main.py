@@ -1,13 +1,15 @@
 import numpy as np
 import lda
 import lda.datasets
+from collections import defaultdict
+import matplotlib.pyplot as plt
 
-n_topics = 50
+n_topics = 6
 
 # test using the health tweets dataset.
-X = lda.datasets.load_datasets('tweets.ldac')
+X = lda.datasets.load_datasets('toy.ldac')
 print("Tweets loaded.")
-vocab = lda.datasets.load_dataset_vocab('tweets.tokens')
+vocab = lda.datasets.load_dataset_vocab('toy.tokens')
 print("Vocab loaded.")
 
 model = lda.LDA(n_topics=n_topics, n_iter=2000, random_state=10)
@@ -33,6 +35,20 @@ for i, topic_dist in enumerate(topic_word):
     topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
     print('Topic {}: {}'.format(i, ' '.join(topic_words)))
 
+
+probs = defaultdict(lambda: 0)
+for i, words in enumerate(topic_word):
+	for j, p in enumerate(words): 
+		probs[j] += p 
+
+for k in probs:
+	probs[k] /= len(topic_word)
+print(probs) 
+
+import pdb; pdb.set_trace()
+plt.bar(range(n_topics), list(probs.values()), color='g', tick_label=list(probs.keys()), width=0.5, edgecolor='blue')
+plt.savefig('topic_prob.png')
+plt.show()
 
 # uncomment to check the entire dataset.
 # print("Document-topic matrix")
