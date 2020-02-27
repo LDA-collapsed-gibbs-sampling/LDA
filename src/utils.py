@@ -1,3 +1,6 @@
+# This script contains util functions to preprocess the data in Chip-Seq dataset.
+
+
 from pandas import read_csv
 from pathlib import Path
 from os import system

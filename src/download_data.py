@@ -1,3 +1,5 @@
+# This script is used to download the Chip-Seq dataset.
+
 from os import system
 from pathlib import Path
 
