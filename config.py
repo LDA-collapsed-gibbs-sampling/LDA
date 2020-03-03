@@ -3,16 +3,24 @@ from easydict import EasyDict as edict
 config = edict()
 
 # configurations for LDA.
-config.N_TOPICS=14
+config.N_TOPICS=12
 
-config.DATA_DIR = './data/toy_data'
+config.DATA_DIR = './data/ChipSeq'
 
-config.TOKENS_FILE= 'toy.tokens'
+config.OUTPUT = './output/'
 
-config.DATA_FILE='toy.ldac'
+config.TOKENS_FILE= 'chipseq.tokens'
 
-config.N_ITER=2000
+config.DATA_FILE='chipseq.ldac'
 
-config.ALPHA=0.01
+config.N_ITER=2500
 
-config.BETA=0.1
+config.ALPHA=0.1
+
+config.ETA=0.01
+
+config.THIN=10
+
+config.BURN_IN=20
+
+config.TOPICS_LIST = [3, 6, 10, 12, 14, 16, 20, 24, 28, 32]

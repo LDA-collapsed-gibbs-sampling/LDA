@@ -1,11 +1,11 @@
 import numpy as np
 import lda
 import lda.datasets as dataset
+# from collections import defaultdict
 import matplotlib.pyplot as plt
 import argparse
 from config import config as cfg
 import os
-import pandas as pd
 
 
 def get_arguments():
@@ -25,9 +25,6 @@ def get_arguments():
 	return parser.parse_args()
 
 def load_data(data_file, tokens_file):
-	'''
-		Function to load the file.
-	'''
 	# load the data file.
 	X = dataset.load_datasets(os.path.join(cfg.DATA_DIR, data_file))
 	# load the vocabulary.
@@ -43,20 +40,25 @@ def plot_likelihood(iterations, likelihood_wts):
 	plt.ylabel('-log(x) (in 10^6)')
 	plt.xlabel('iterations')
 	plt.title('Iterations vs Negative log-likelihood')
-	plt.savefig(cfg.OUTPUT+'likelihood.png')
+	plt.savefig('likelihood.png')
 	# plt.show()
+
+def plot_likelihood_topics(ntopics, likelihood):
+	'''
+		Plot the likelihood curve with different number of topics.
+	'''
+	plt.plot(ntopics, likelihood)
+	plt.xticks(ntopics)
+	plt.ylabel('-log(x) (in 10^6)')
+	plt.xlabel('No of topics')
+	plt.title('likelihood vs no of topics')
+	plt.savefig('likelihoodtopics.png')
+	plt.show()
 
 def plot_topic_probability(n_topics, probs):
 	plt.bar(n_topics, probs, color='g', tick_label=probs, width=0.5, edgecolor='blue')
 	plt.savefig('likelihood.png')
 	plt.show()
-
-def plot_topic_words(probs, topic_no):
-	# import pdb; pdb.set_trace()
-	df = pd.DataFrame({'probability': list(probs.values()), 'TF': list(probs.keys())}, index=list(probs.keys()))
-	df.plot.barh(rot=15, title=topic_no, legend=False)
-	# plt.show()
-	plt.savefig(cfg.OUTPUT+topic_no+'.png')
 
 
 def main():
@@ -71,42 +73,17 @@ def main():
 	data, vocab = load_data(args.data_file, args.tokens_file)
 	print("Data loaded successfully!")
 
-	# set model parameters
-	model = lda.LDA(args.n_topics, n_iter=args.n_iter, alpha=args.alpha, eta=args.eta, random_state=args.random_state, thin=args.thin, burn_in=args.burn_in)
+	likelihood = []
+	# compare the log likelihood for different number of topics.
+	for ntopics in cfg.TOPICS_LIST:
+		# set model parameters
+		model = lda.LDA(ntopics, n_iter=args.n_iter, alpha=args.alpha, eta=args.eta, random_state=args.random_state, thin=args.thin, burn_in=args.burn_in)
 
-	# initializes the model parameters with the initial probabilties.
-	# runs the model for given no of iterations and get the model parameters.
-	# access the model resuls using topic_word_ or components_
-	model.fit(data)  # model.fit_transform(X) is also available
+		model.fit(data)  # model.fit_transform(X) is also available
 
-	# Plot the likelihood.
-	plot_likelihood(args.n_iter, model.loglikelihoods_iter)
+		likelihood.append(model.ll)
 
-	# Plot the topic probability distribution
-	# plot_topic_probability(args.n_topics, probs)
-
-	# gives the final topic word distribution. can be used for inference.
-	topic_word = model.topic_word_  # model.components_ also works
-
-	print("Topic-word matrix")
-	print(topic_word)
-
-	# highly correlated
-	# give topic results
-	# graph - high probability with same topic - topic 10
-	# doc topic distribution
-
-	# topics = defaultdict(lambda: defaultdict(lambda: 0))
-	for topic, words in enumerate(topic_word):
-		# obtain the index of top 10 words belonging to that topic
-		top_10 = sorted(range(len(words)), key=lambda i: words[i], reverse=True)[:10]
-		# map the word indices to the actual words with probability
-		probwords = dict()
-		for ind in top_10:
-			probwords[vocab[ind]] = words[ind]
-		plot_topic_words(probwords, 'topic'+str(topic))
-	
-
+	plot_likelihood_topics(cfg.TOPICS_LIST, likelihood)
 
 if __name__ == '__main__':
 	main()

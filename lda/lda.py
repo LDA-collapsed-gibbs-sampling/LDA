@@ -92,15 +92,16 @@ class LDA:
     """
 
     def __init__(self, n_topics, n_iter=2000, alpha=0.1, eta=0.01, random_state=None,
-                 refresh=10):
+                 thin=10, burn_in=20):
         self.n_topics = n_topics
         self.n_iter = n_iter
+        self.burn_in = burn_in
         self.alpha = alpha
         self.eta = eta
         # if random_state is None, check_random_state(None) does nothing
         # other than return the current numpy RandomState
         self.random_state = random_state
-        self.refresh = refresh
+        self.refresh = thin
 
         if alpha <= 0 or eta <= 0:
             raise ValueError("alpha and eta must be greater than zero")
@@ -242,26 +243,56 @@ class LDA:
         random_state = lda.utils.check_random_state(self.random_state)
         rands = self._rands.copy()
         self._initialize(X)
+        nsample = 0
+
+        # run for specific iterations
         for it in range(self.n_iter):
-            # FIXME: using numpy.roll with a random shift might be faster
-            # instead of throwing away data, we randomize it.
             random_state.shuffle(rands)
+
+            # Thinning - used to avoid correlation
             if it % self.refresh == 0:
                 ll = self.loglikelihood()
                 logger.info("<{}> log likelihood: {:.0f}".format(it, ll))
+                
                 # keep track of loglikelihoods for monitoring convergence
                 self.loglikelihoods_.append(ll)
-                self.loglikelihoods_iter.append(ll)
+                self.loglikelihoods_iter.append(-1*ll/1000000) # for the ease of plotting the values.
+
+                # calculate the doc-topic and word-topic distrbution and store it after the burn in period.
+                if it > self.burn_in:
+                    components_it = (self.nzw_ + self.eta).astype(float)
+                    components_it /= np.sum(components_it, axis=1)[:, np.newaxis]
+                    doc_topic_it = (self.ndz_ + self.alpha).astype(float)
+                    doc_topic_it /= np.sum(doc_topic_it, axis=1)[:, np.newaxis]
+                    self.components_ += components_it
+                    self.doc_topic_ += doc_topic_it
+                    nsample += 1
+
+            # draw a sample topic from the joint probability distribution
             self._sample_topics(rands)
+        
+        # calculate the log likelihood after the final iteration.
         ll = self.loglikelihood()
+        self.ll = -1*ll/10000
+        components_it = (self.nzw_ + self.eta).astype(float)
+        components_it /= np.sum(components_it, axis=1)[:, np.newaxis]
+        doc_topic_it = (self.ndz_ + self.alpha).astype(float)
+        doc_topic_it /= np.sum(doc_topic_it, axis=1)[:, np.newaxis]
+        self.components_ += components_it
+        self.doc_topic_ += doc_topic_it
+        nsample += 1
         
         logger.info("<{}> log likelihood: {:.0f}".format(self.n_iter - 1, ll))
-        # note: numpy /= is integer division
-        self.components_ = (self.nzw_ + self.eta).astype(float)
-        self.components_ /= np.sum(self.components_, axis=1)[:, np.newaxis]
+
+        # average the gibbs samples of theta and phi (document-topic and topic-word).
+        self.components_ /= nsample
+        self.doc_topic_ /= nsample
+
+        # self.components_ = (self.nzw_ + self.eta).astype(float)
+        # self.components_ /= np.sum(self.components_, axis=1)[:, np.newaxis]
+        # self.doc_topic_ = (self.ndz_ + self.alpha).astype(float)
+        # self.doc_topic_ /= np.sum(self.doc_topic_, axis=1)[:, np.newaxis]
         self.topic_word_ = self.components_
-        self.doc_topic_ = (self.ndz_ + self.alpha).astype(float)
-        self.doc_topic_ /= np.sum(self.doc_topic_, axis=1)[:, np.newaxis]
 
         # delete attributes no longer needed after fitting to save memory and reduce clutter
         del self.WS
@@ -281,12 +312,15 @@ class LDA:
         logger.info("n_iter: {}".format(n_iter))
 
         self.nzw_ = nzw_ = np.zeros((n_topics, W), dtype=np.intc)
+        self.components_ = np.zeros((n_topics, W), dtype=np.float64)
         self.ndz_ = ndz_ = np.zeros((D, n_topics), dtype=np.intc)
+        self.doc_topic_ = np.zeros((D, n_topics), dtype=np.float64)
         self.nz_ = nz_ = np.zeros(n_topics, dtype=np.intc)
 
         self.WS, self.DS = WS, DS = lda.utils.matrix_to_lists(X)
         self.ZS = ZS = np.empty_like(self.WS, dtype=np.intc)
         np.testing.assert_equal(N, len(WS))
+
         for i in range(N):
             w, d = WS[i], DS[i]
             z_new = i % n_topics
