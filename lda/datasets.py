@@ -17,7 +17,10 @@ def load_dataset_vocab(dataset_path):
         Function to load the vocabulary.
     '''
     with open(dataset_path) as f:
-        vocab = tuple(f.read().split())
+        vocabulary = tuple(f.read().split())
+    vocab = []
+    for v in vocabulary:
+        vocab.append(int(v))
     return vocab
 
 

@@ -18,10 +18,11 @@ def get_arguments():
 	parser.add_argument("--data-file", type=str, default=cfg.DATA_FILE, help="Data filename")
 	parser.add_argument("--n-iter", type=int, default=cfg.N_ITER, help="No of iterations")
 	parser.add_argument("--random-state", type=int, default=10, help="Random state")
-	parser.add_argument("--alpha", type=int, default=cfg.ALPHA, help="Dirichlet prior alpha")
+	parser.add_argument("--alpha", type=int, default=cfg.ALPHA, help="Dirichlet prior alpha (Topic prior)")
 	parser.add_argument("--eta", type=int, default=cfg.ETA, help="Dirichlet prior eta")
 	parser.add_argument("--thin", type=int, default=cfg.THIN, help="thin samples.")
 	parser.add_argument("--burn-in", type=int, default=cfg.BURN_IN, help="Burn in iterations")
+	parser.add_argument("--topic-distr", type=str, default=cfg.TOPIC_DISTR, help="File to store topic words distribution")
 	return parser.parse_args()
 
 def load_data(data_file, tokens_file):
@@ -90,6 +91,9 @@ def main():
 
 	print("Topic-word matrix")
 	print(topic_word)
+
+	# save the topic word distribution in a pickle file
+	topic_word.dump(args.topic_distr)
 
 	# highly correlated
 	# give topic results
