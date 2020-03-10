@@ -4,12 +4,12 @@ from collections import defaultdict
 # Toy dataset
 # generate multinomial distribution
 data = []
-n_docs = 100
-n_tokens = 5
+n_docs = 20
+n_tokens = 50
 for d in range(n_docs):
     nums = []
     for t in range(n_tokens):
-        nums.append(np.random.multinomial(1, [4/6, 1/6, 1/6]).argmax())
+        nums.append(np.random.multinomial(1, [1/20]*20).argmax())
     data.append(nums)
 # np.savetxt('./lda/tests/toy.txt', data, fmt="%d")
 
@@ -25,7 +25,7 @@ with open('./data/toy_data/toy.tokens', 'w') as f:
         token_dict[t]=len(token_dict)
         f.write(str(t)+"\n")
 
-# print("Running on ", len(data), " tweets")
+print("Running on ", len(data), " tweets")
 with open('./data/toy_data/toy.ldac', 'w') as f:
     for i, line in enumerate(data):
         doc_term = defaultdict(lambda: 0)

@@ -3,9 +3,9 @@ from easydict import EasyDict as edict
 config = edict()
 
 # configurations for LDA.
-config.N_TOPICS=10 	# number of topics
+config.N_TOPICS = 3	# number of topics
 
-config.DATA_DIR = './data/toy_data' # data directory
+config.DATA_DIR = './data/toy_data/same distribution' # data directory
 
 config.OUTPUT = './output/' # output directory to save graphs
 

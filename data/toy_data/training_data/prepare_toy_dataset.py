@@ -9,7 +9,7 @@ n_tokens = 5
 for d in range(n_docs):
     nums = []
     for t in range(n_tokens):
-        nums.append(np.random.multinomial(1, [4/6, 1/6, 1/6]).argmax())
+        nums.append(np.random.multinomial(1, [1/3]*3).argmax())
     data.append(nums)
 # np.savetxt('./lda/tests/toy.txt', data, fmt="%d")
 
