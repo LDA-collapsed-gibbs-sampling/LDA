@@ -3,17 +3,16 @@
 	Importance sampling vs Exact Inference
 '''
 
+from lda.importance_sampling import importance_sampling 
+from lda.exact_inference import exact_inference
 import numpy as np
 import lda
 import lda.datasets as dataset
-from lda.exact import exact_inference 
 import matplotlib.pyplot as plt
 import argparse
 from config import config as cfg
 import os
 import pandas as pd
-from lda.importance_sampling import importance_sampling 
-from lda.exact import exact_inference
 import random
 import time
 
@@ -23,7 +22,6 @@ def get_arguments():
 		Parse all the command line arguments.
 	"""
 	parser = argparse.ArgumentParser(description='LDA arguments')
-	# parser.add_argument("--n-topics", type=int, default=cfg.N_TOPICS, help="No of topics")
 	parser.add_argument("--tokens-file", type=str, default=cfg.TOKENS_FILE, help="Tokens file")
 	parser.add_argument("--data-file", type=str, default=cfg.DATA_FILE, help="Data filename")
 	parser.add_argument("--n-iter", type=int, default=cfg.N_ITER, help="No of iterations")
@@ -41,10 +39,9 @@ def load_data(data_file, tokens_file):
 	'''
 		Function to load the file.
 	'''
-	# load the data file.
-	X = dataset.load_datasets(os.path.join(cfg.DATA_DIR, data_file))
-	# load the vocabulary.
-	vocab = dataset.load_dataset_vocab(os.path.join(cfg.DATA_DIR, tokens_file))
+	
+	X = dataset.load_datasets(os.path.join(cfg.DATA_DIR, data_file))					# load the data file.
+	vocab = dataset.load_dataset_vocab(os.path.join(cfg.DATA_DIR, tokens_file))			# load the vocabulary.
 	return X, vocab
 
 
@@ -57,7 +54,6 @@ def plot_likelihood(iterations, likelihood_wts):
 	plt.xlabel('iterations')
 	plt.title('Iterations vs Negative log-likelihood')
 	plt.savefig(cfg.OUTPUT+'likelihood.png')
-	# plt.show()
 
 def plot_topic_probability(n_topics, probs):
 	plt.bar(n_topics, probs, color='g', tick_label=probs, width=0.5, edgecolor='blue')
@@ -95,22 +91,9 @@ def main():
 
 	# compare for different number of topics.
 	topics_ar = [2, 3, 4, 5, 6]
+
 	for n_topics in topics_ar:
-		# load the dataset
-		# data, vocab = load_data(args.data_file, args.tokens_file)
-		# print("Data loaded successfully!")
-
-		# # set model parameters
-		# model = lda.LDA(n_topics, n_iter=args.n_iter, alpha=args.alpha, eta=args.eta, random_state=args.random_state, thin=args.thin, burn_in=args.burn_in)
-
-		# model.fit(data)  
-
-		# # gives the final topic word distribution. can be used for inference.
-		# topic_word = model.topic_word_  
-
-		# # save the topic word distribution in a pickle file
-		# topic_word.dump(args.topic_distr+str(n_topics)+'.pkl')
-
+		# load the topic word distribution
 		topic_word = np.load(args.topic_distr+str(n_topics)+'.pkl', allow_pickle=True)
 
 		'''
@@ -126,7 +109,7 @@ def main():
 		log_prob_imp, log_prob_exact, count = 0, 0, 0
 
 		documents = open(testing_file).readlines()
-		documents = documents[:10] # evaluate on the first 10 documents.
+		documents = documents							 # evaluate on the first 10 documents.
 
 		start_time = time.time()
 		for d in documents:
@@ -143,7 +126,6 @@ def main():
 			log_prob_imp += importance_sampling(document, topic_word, topic_prior, args.num_samples, topic_list)
 			log_prob_exact += exact_inference(document, topic_word, topic_prior)
 			
-
 		importance.append(log_prob_imp/count)
 		exact.append(log_prob_exact/count)
 
@@ -151,8 +133,7 @@ def main():
 		print("Log probability using importance sampling on the testing dataset for {} topic on {} documents: {:.3f}".format(n_topics, count, importance[-1]))
 		print("Log probability using exact sampling on the testing dataset for {} topic on {} documents: {:.3f}".format(n_topics, count, exact[-1]))
 		
-	print(importance)
-	print(exact)
+
 	plot_likelihood_topics(topics_ar, importance, exact)
 
 

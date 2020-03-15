@@ -45,22 +45,30 @@ def plot_likelihood(iterations, likelihood_wts):
 	plt.xlabel('iterations')
 	plt.title('Iterations vs Negative log-likelihood')
 	plt.savefig(cfg.OUTPUT+'likelihood.png')
-	# plt.show()
+	
 
 def plot_topic_probability(n_topics, probs):
+	'''
+		Plot a bar graph for the topic probability.
+	'''
 	plt.bar(n_topics, probs, color='g', tick_label=probs, width=0.5, edgecolor='blue')
 	plt.savefig('likelihood.png')
 	plt.show()
 
+
 def plot_topic_words(probs, topic_no):
-	# import pdb; pdb.set_trace()
+	'''
+		Plot the topic word probability.
+	'''
 	df = pd.DataFrame({'probability': list(probs.values()), 'TF': list(probs.keys())}, index=list(probs.keys()))
 	df.plot.barh(rot=15, title=topic_no, legend=False)
-	# plt.show()
 	plt.savefig(cfg.OUTPUT+topic_no+'.png')
 
-
 def main():
+	# create an output directory.
+	if not os.path.exists(cfg.OUTPUT):
+		os.mkdir(cfg.OUTPUT)
+
 	# Print the arguments
 	args = get_arguments()
 	print("Dirichlet prior eta for Document-topic distribution: ", args.eta)
@@ -80,12 +88,6 @@ def main():
 	# access the model resuls using topic_word_ or components_
 	model.fit(data)  # model.fit_transform(X) is also available
 
-	# Plot the likelihood.
-	plot_likelihood(args.n_iter, model.loglikelihoods_iter)
-
-	# Plot the topic probability distribution
-	# plot_topic_probability(args.n_topics, probs)
-
 	# gives the final topic word distribution. can be used for inference.
 	topic_word = model.topic_word_  # model.components_ also works
 
@@ -93,14 +95,9 @@ def main():
 	print(topic_word)
 
 	# save the topic word distribution in a pickle file
-	topic_word.dump(args.topic_distr)
+	topic_word.dump(args.topic_distr+'.pkl')
 
-	# highly correlated
-	# give topic results
-	# graph - high probability with same topic - topic 10
-	# doc topic distribution
-
-	# topics = defaultdict(lambda: defaultdict(lambda: 0))
+	
 	for topic, words in enumerate(topic_word):
 		# obtain the index of top 10 words belonging to that topic
 		top_10 = sorted(range(len(words)), key=lambda i: words[i], reverse=True)[:10]
@@ -108,9 +105,9 @@ def main():
 		probwords = dict()
 		for ind in top_10:
 			probwords[vocab[ind]] = words[ind]
+			
 		plot_topic_words(probwords, 'topic'+str(topic))
 	
-
 
 if __name__ == '__main__':
 	main()

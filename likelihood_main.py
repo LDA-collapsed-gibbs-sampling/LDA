@@ -1,7 +1,6 @@
 import numpy as np
 import lda
 import lda.datasets as dataset
-# from collections import defaultdict
 import matplotlib.pyplot as plt
 import argparse
 from config import config as cfg
@@ -41,7 +40,7 @@ def plot_likelihood(iterations, likelihood_wts):
 	plt.xlabel('iterations')
 	plt.title('Iterations vs Negative log-likelihood')
 	plt.savefig('likelihood.png')
-	# plt.show()
+
 
 def plot_likelihood_topics(ntopics, likelihood):
 	'''
@@ -53,12 +52,11 @@ def plot_likelihood_topics(ntopics, likelihood):
 	plt.xlabel('No of topics')
 	plt.title('likelihood vs no of topics')
 	plt.savefig('likelihoodtopics.png')
-	plt.show()
+
 
 def plot_topic_probability(n_topics, probs):
 	plt.bar(n_topics, probs, color='g', tick_label=probs, width=0.5, edgecolor='blue')
 	plt.savefig('likelihood.png')
-	plt.show()
 
 
 def main():

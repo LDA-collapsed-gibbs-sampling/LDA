@@ -11,7 +11,6 @@ def importance_sampling(document, topic_word, topic_prior, num_samples, topic_li
 		topic_list - List of topics
 	'''
 
-	# number of words in the document
 	Nd = len(document)
 
 	# 1. change the topic priors to Tx1
@@ -31,7 +30,6 @@ def importance_sampling(document, topic_word, topic_prior, num_samples, topic_li
 	# sample topics from a discrete distribution for each word.
 	# Nd X num_samples
 	samples = np.zeros((Nd, num_samples), dtype=np.uint8)
-
 	for n in range(Nd):
 		samples[n] = np.random.choice(topic_list, num_samples, list(qq[:,n])) # in this case, the probability will be the same.
 
@@ -46,9 +44,6 @@ def importance_sampling(document, topic_word, topic_prior, num_samples, topic_li
 	log_pz = loggamma(Nk+topic_prior).sum(axis=0) \
 			+ loggamma(topic_alpha) - loggamma(topic_prior).sum() \
 			- loggamma(Nd+topic_alpha)
-	# log_pz = math.log(math.gamma(Nk+topic_prior)).sum(axis=0) \
-	# 		+ math.log(math.gamma(topic_alpha)) - math.log(math.gamma(topic_prior)).sum() \
-	# 		- math.log(math.gamma(Nd+topic_alpha))
 
 	# P(w/z)
 	log_w_given_z = np.zeros((1, num_samples), dtype=np.float64)

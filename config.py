@@ -3,9 +3,11 @@ from easydict import EasyDict as edict
 config = edict()
 
 # configurations for LDA.
-config.N_TOPICS = 3	# number of topics
+config.N_TOPICS = 2	# number of topics
 
-config.DATA_DIR = './data/toy_data/same distribution' # data directory
+config.DATA_DIR = './data/toy_data/' # data directory
+
+config.TEST_DIR = './data/toy_data/' # data directory
 
 config.OUTPUT = './output/' # output directory to save graphs
 
@@ -23,7 +25,7 @@ config.THIN=10 # to apply thinning
 
 config.BURN_IN=20 # burn in 
 
-config.TOPIC_DISTR = 'word_topic.pkl' # file to store topic-word distribution
+config.TOPIC_DISTR = 'word_topic' # file to store topic-word distribution
 
 config.TEST_DOC = 'toy.ldac'
 
@@ -32,3 +34,9 @@ config.TOPICS_LIST = [3, 6, 10, 12, 14, 16, 20, 24, 28, 32]
 
 # parameters specific to evaluation. 
 config.NUM_SAMPLES = 1500
+
+# Compare the perplexity
+config.NUM_SAMPLES_LIST = list(range(1, 1000, 50)) 
+
+# 
+config.NUM_PARTICLES = 100 
