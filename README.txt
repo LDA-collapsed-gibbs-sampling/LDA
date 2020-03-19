@@ -13,3 +13,4 @@
 5.	To run the inference scripts.
 	python importance_ltr_compare.py
 
+Latent Dirichlet allocation (LDA) using collapsed Gibbs sampling was implemented in reference to https://github.com/lda-project/lda.
